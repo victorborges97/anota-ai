@@ -136,7 +136,7 @@ const TodoScreen = () => {
             <div className="flex flex-col ml-8 mr-8">
                 <div className="flex flex-col md:flex-row justify-center md:justify-between items-center md:items-between w-full min-w-0 mt-8 p-6 mb-5 text-gray-900 dark:text-white bg-slate-200 dark:bg-[#282c34] rounded-xl">
 
-                    <p>Seja bem-vindo, <span className="font-bold">{user ? user.displayName : ""}</span></p>
+                    <p>Seja bem-vindo <span className="font-bold">{userJson ? `, ${userJson?.displayName}` : ""}</span></p>
 
                     <IconButton
                         onClick={() => {

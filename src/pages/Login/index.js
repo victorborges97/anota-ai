@@ -25,7 +25,7 @@ const Login = () => {
         try {
             await authenticated?.loginEmail(email, senha);
 
-            replace("/anotacoes");
+            replace("/");
 
         } catch (error) {
             toast.error("Error ao fazer login!");

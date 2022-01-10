@@ -26,7 +26,7 @@ const Register = () => {
         try {
             await authenticated?.registerEmail(nome, email, senha);
 
-            replace("/anotacoes");
+            replace("/");
 
         } catch (error) {
             toast.error("Error ao se registrar!");
