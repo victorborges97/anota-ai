@@ -18,7 +18,6 @@ export function useDatabaseColecao(idUser) {
                 var data = [];
                 for (let key in colecoesData) {
                     let item = colecoesData[key];
-                    console.log(item)
                     data.push({ createAt: item.createAt, key: item.key, name: item.name, updateAt: item.updateAt })
                 }
                 setColecoes(data);

@@ -52,17 +52,14 @@ export default function FirebaseProvider({ children }) {
     function writeUserData(userId, userInfor) {
         set(ref(database, 'users/' + userId), userInfor);
     }
-
     function onUserData(userId) {
         let user = {};
         const userRef = ref(database, 'users/' + userId);
         onValue(userRef, (snapshot) => {
             user = snapshot.val();
-            console.log("user: ", user);
             setUser(user)
         });
     }
-
     function getUserData(userId) {
         return getDb("users/" + userId);;
     }
@@ -80,91 +77,25 @@ export default function FirebaseProvider({ children }) {
 
     const isAuthenticated = () => localStorage.getItem(TOKEN) !== null ? true : false;
 
-    //DISCIPLINAS
 
-    //   function getDisciplinas() {
-    //     dispatch(ActionDisciplinas.addComponentes({ isLoading: true }))
-    //     database.child("disciplinas").on('value', (dbPhoto) => {
-    //       const todos = dbPhoto.val()
-    //       let todosList = []
-    //       if (todos) {
-    //         for (let id in todos) {
-    //           todosList.push({ id, ...todos[id] })
-    //         }
-    //         console.log("GET DISCIPLINAS")
-    //         // const order = componentes.sortByDisciplina.order === "asc" ? 1 : -1
-    //         // const dataOrd = [...todosList]
-    //         // dataOrd.sort((a, b) => (a[componentes.sortByDisciplina.key] > b[componentes.sortByDisciplina.key] ? order : -order))
-    //         dispatch(ActionDisciplinas.addDisciplinas(todosList))
-    //         dispatch(ActionDisciplinas.addComponentes({ isLoading: false }))
-    //       }
-    //     });
-    //   }
-
-    //   function addDisciplina(item) {
-    //     database.child('disciplinas').push(
-    //       JSON.parse(JSON.stringify(item))
-    //     )
-    //       .then(doc => {
-    //         Alert.success('Disciplina adicionada com sucesso!')
-    //       })
-    //       .catch((error) => {
-    //         Alert.error('Error ao adicionar a disciplina.')
-    //         console.error(error);
-    //       })
-    //   }
-
-    //   function updateDisciplina(item, alerta = true) {
-    //     const id = item.id
-    //     delete item.id
-    //     database.child(`disciplinas/${id}`).update(
-    //       item
-    //     )
-    //       .then(doc => {
-    //         if (alerta) {
-    //           Alert.success('Disciplina atualizada com sucesso!')
-    //         }
-    //       })
-    //       .catch((error) => {
-    //         Alert.error('Error ao atualizar a disciplina.')
-    //         console.error(error);
-    //       })
-    //   }
-
-    //   function deleteDisciplina(id) {
-    //     database.child(`disciplinas/${id}`).remove()
-    //       .then(() => {
-    //         Alert.success('Disciplina deletado com sucesso!')
-    //       })
-    //       .catch((error) => {
-    //         Alert.error('Error ao deletar Disciplina.')
-    //         console.error(error);
-    //       })
-    //   }
-
-    //CURSOS
     //LOGIN E LOGOUT
-
     async function getDb(path) {
         return get(child(dbRef, `${path}`));
     }
-
     async function reDb(path) {
         remove(child(dbRef, `${path}`))
     }
-
     async function upDb(path, updates) {
         update(child(dbRef, `${path}`), updates);
     }
-
     async function onDb(path, callback) {
         onValue(child(dbRef, `${path}`), callback);
     }
-
     async function setDb(path, data) {
         set(child(dbRef, `${path}`), data);
     }
 
+    //LOGIN, LOGOUT E REGISTER
     async function registerEmail(nome, email, senha) {
         if (nome === null || nome === "") {
             throw new Error({ message: 'Nome está faltando' });
@@ -182,8 +113,6 @@ export default function FirebaseProvider({ children }) {
 
             if (user) {
 
-                LoginLocalStorage(user);
-
                 const userInfor = {
                     "uid": user.uid,
                     "photoURL": user.photoURL,
@@ -192,6 +121,8 @@ export default function FirebaseProvider({ children }) {
                     "displayName": nome,
                     "refreshToken": user.refreshToken,
                 }
+
+                LoginLocalStorage(userInfor);
 
                 writeUserData(
                     userInfor.uid,
@@ -208,12 +139,9 @@ export default function FirebaseProvider({ children }) {
 
             }
         } catch (error) {
-            //   Alert.info(`${error.message}`);
             throw new Error(error);
-            // console.log(`${error.message}`)
         }
     }
-
     async function loginEmail(email, senha) {
         if (email === null || email === "") {
             throw new Error({ message: 'E-mail está faltando' });
@@ -225,12 +153,10 @@ export default function FirebaseProvider({ children }) {
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, senha);
 
-            console.log(user)
-
             if (user) {
 
                 let userData = await getUserData(user.uid);
-                console.log("userData," + JSON.parse(userData))
+
                 const userInfor = {
                     "uid": user.uid,
                     "photoURL": userData.photoURL,
@@ -239,24 +165,20 @@ export default function FirebaseProvider({ children }) {
                     "displayName": userData.displayName,
                     "refreshToken": user.refreshToken,
                 }
-                console.log("userInfor," + userInfor)
+
                 LoginLocalStorage(userInfor);
                 setUser(userInfor)
 
             }
         } catch (error) {
-            //   Alert.info(`${error.message}`);
             throw new Error(error);
-            // console.log(`${error.message}`)
         }
     }
-
     function logoutEmail() {
         auth.signOut();
         setUser(null);
         LogoutLocalStorage();
     }
-
     const LogoutLocalStorage = () => {
         localStorage.removeItem(TOKEN);
         localStorage.removeItem(USER);

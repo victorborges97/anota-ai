@@ -18,8 +18,6 @@ export function useDatabaseAnotacao(idUser) {
                 var data = [];
                 for (let key in anotacoesData) {
                     let item = anotacoesData[key];
-                    console.log(item)
-
                     data.push({
                         createAt: item.createAt,
                         key: item.key,

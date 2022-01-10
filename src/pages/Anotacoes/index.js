@@ -65,8 +65,6 @@ const TodoScreen = () => {
             return handleError(true, "Por favor preencha o nome da coleção!");
         }
 
-        console.log("inputModal: ", inputModal)
-
         if (itemModal != null) {
             updateColecao(inputModal, itemModal.key);
         } else {
