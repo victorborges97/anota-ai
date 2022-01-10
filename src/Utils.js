@@ -12,7 +12,7 @@ export function compare(a, b) {
 }
 
 export function arrayString(arr, separador) {
-  arr = arr.filter(space => space != "")
+  arr = arr.filter(space => space !== "")
   return arr
     .map((s, i) => {
       if (i >= arr.length - 1) {

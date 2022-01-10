@@ -1,16 +1,18 @@
-import { useFirebase } from "../../context/firebase";
+import { auth, useFirebase } from "../../context/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import { useRecoilState } from "recoil";
 import { tabsListState } from "../../Atons/Todo";
 
-export function useDatabaseColecao() {
-    const { getDb, setDb, onDb, upDb, reDb } = useFirebase();
+export function useDatabaseColecao(idUser) {
+    const { setDb, onDb, upDb, reDb } = useFirebase();
+
+    const pathColecaoUser = `colecoes/${idUser}`;
 
     const [colecoes, setColecoes] = useRecoilState(tabsListState)
 
     async function init() {
 
-        onDb("colecoes", (snapshot) => {
+        onDb(pathColecaoUser, (snapshot) => {
             if (snapshot.exists()) {
                 let colecoesData = snapshot.val();
                 var data = [];
@@ -32,7 +34,7 @@ export function useDatabaseColecao() {
         const id = uuidv4();
 
         setDb(
-            "colecoes/" + id,
+            pathColecaoUser + "/" + id,
             {
                 key: id,
                 name: tabsInput,
@@ -57,7 +59,7 @@ export function useDatabaseColecao() {
         // setColecoes(olds);
 
         upDb(
-            "colecoes/" + id,
+            pathColecaoUser + "/" + id,
             {
                 name,
                 updateAt: new Date().toString(),
@@ -68,7 +70,7 @@ export function useDatabaseColecao() {
     function deleteColecao(id) {
         // setColecoes((old) => old.filter((item) => item.key !== keytabs))
 
-        reDb("colecoes/" + id);
+        reDb(pathColecaoUser + "/" + id);
     }
 
     function getColecao(keytabs) {

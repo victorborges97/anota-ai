@@ -4,10 +4,12 @@ import { VscSave, VscSaveAs } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import Button from "../../components/button";
 import { useDatabaseAnotacao } from "../../hooks/anotacaoHook";
+import { useFirebase } from "../../context/firebase";
 
 export const Todo = ({ tabSelecionada, handleError }) => {
 
-    const { anotacoes: dataAnotacoes, getColecoesId, addAnotacao, deleteAnotacao, updateAnotacao } = useDatabaseAnotacao()
+    const { user } = useFirebase();
+    const { anotacoes: dataAnotacoes, getColecoesId, addAnotacao, deleteAnotacao, updateAnotacao } = useDatabaseAnotacao(user?.uid)
     const [anotacoes, setAnotacoes] = useState([]);
 
     const [value, setValue] = useState("");

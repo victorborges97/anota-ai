@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { FiLogOut } from "react-icons/fi"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,13 +12,16 @@ import Toggle from '../../components/themeToggle';
 import Background from '../../components/background';
 import { ItemColecao, Modal, Todo } from './components';
 import Confirm from '../../components/confirm';
-import { useFirebase } from '../../context/firebase';
+import { useFirebase, USER } from '../../context/firebase';
 import IconButton from '../../components/iconButton';
 
 const TodoScreen = () => {
+    const userJson = JSON.parse(localStorage.getItem(USER));
+
+    const { replace } = useHistory()
     const { user, authenticated } = useFirebase();
-    const { colecoes, init: initColecao, addColecao, deleteColecao, updateColecao } = useDatabaseColecao()
-    const { init: initAnotacao, deleteAnotacaoColecoesId } = useDatabaseAnotacao()
+    const { colecoes, init: initColecao, addColecao, deleteColecao, updateColecao } = useDatabaseColecao(userJson?.uid)
+    const { init: initAnotacao, deleteAnotacaoColecoesId } = useDatabaseAnotacao(userJson?.uid)
 
     // Colecao Selecionada
     const [tabSelecionada, setTabSelecionada] = useState(colecoes.lenght <= 0 ? null : colecoes[0]);
@@ -32,9 +36,11 @@ const TodoScreen = () => {
     const [itemConfirm, setItemConfirm] = useState(null);
 
     useEffect(() => {
-        init();
+        if (userJson.uid !== null) {
+            init();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [userJson?.uid])
 
     async function init() {
         await initColecao();
@@ -135,7 +141,10 @@ const TodoScreen = () => {
                     <p>Seja bem-vindo, <span className="font-bold">{user ? user.displayName : ""}</span></p>
 
                     <IconButton
-                        onClick={() => authenticated.logoutEmail()}
+                        onClick={() => {
+                            authenticated.logoutEmail();
+                            replace("/login")
+                        }}
                         className="flex items-center justify-center"
                     >
                         Sair <p className="w-2"></p>

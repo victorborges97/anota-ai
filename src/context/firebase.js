@@ -26,7 +26,7 @@ const FirebaseContext = createContext();
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const dbRef = ref(database);
-const auth = getAuth();
+export const auth = getAuth();
 
 export default function FirebaseProvider({ children }) {
 
@@ -39,7 +39,7 @@ export default function FirebaseProvider({ children }) {
                 // https://firebase.google.com/docs/reference/js/firebase.User
                 LoginLocalStorage(user);
 
-                getUserData(user.uid);
+                onUserData(user.uid);
                 // ...
             } else {
                 // User is signed out
@@ -53,7 +53,7 @@ export default function FirebaseProvider({ children }) {
         set(ref(database, 'users/' + userId), userInfor);
     }
 
-    function getUserData(userId) {
+    function onUserData(userId) {
         let user = {};
         const userRef = ref(database, 'users/' + userId);
         onValue(userRef, (snapshot) => {
@@ -61,6 +61,10 @@ export default function FirebaseProvider({ children }) {
             console.log("user: ", user);
             setUser(user)
         });
+    }
+
+    function getUserData(userId) {
+        return getDb("users/" + userId);;
     }
 
     let authenticated = {
@@ -225,17 +229,18 @@ export default function FirebaseProvider({ children }) {
 
             if (user) {
 
-                LoginLocalStorage(user);
-
+                let userData = await getUserData(user.uid);
+                console.log("userData," + JSON.parse(userData))
                 const userInfor = {
                     "uid": user.uid,
-                    "photoURL": user.photoURL,
-                    "phoneNumber": user.phoneNumber,
-                    "email": user.email,
-                    "displayName": user.displayName,
+                    "photoURL": userData.photoURL,
+                    "phoneNumber": userData.phoneNumber,
+                    "email": userData.email,
+                    "displayName": userData.displayName,
                     "refreshToken": user.refreshToken,
                 }
-
+                console.log("userInfor," + userInfor)
+                LoginLocalStorage(userInfor);
                 setUser(userInfor)
 
             }

@@ -1,16 +1,18 @@
-import { useFirebase } from "../../context/firebase";
+import { auth, useFirebase } from "../../context/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import { useRecoilState } from "recoil";
 import { todosListState } from "../../Atons/Todo";
 
-export function useDatabaseAnotacao() {
+export function useDatabaseAnotacao(idUser) {
     const { setDb, onDb, upDb, reDb } = useFirebase();
+
+    const pathAnotacoesUser = `anotacoes/${idUser}`;
 
     const [anotacoes, setAnotacoes] = useRecoilState(todosListState)
 
     async function init() {
 
-        onDb("anotacoes", (snapshot) => {
+        onDb(pathAnotacoesUser, (snapshot) => {
             if (snapshot.exists()) {
                 let anotacoesData = snapshot.val();
                 var data = [];
@@ -37,9 +39,8 @@ export function useDatabaseAnotacao() {
 
     function addAnotacao(input, colecaoId) {
         const id = uuidv4();
-
         setDb(
-            "anotacoes/" + id,
+            pathAnotacoesUser + "/" + id,
             {
                 createAt: new Date().toString(),
                 key: id,
@@ -51,21 +52,8 @@ export function useDatabaseAnotacao() {
     }
 
     function updateAnotacao(input, id) {
-        // let olds = [...anotacoes];
-        // olds = olds.map(item => {
-        //     if (item.key === id) {
-        //         return {
-        //             ...item,
-        //             name: name,
-        //             update_at: new Date()
-        //         }
-        //     }
-        //     return item;
-        // });
-        // setAnotacoes(olds);
-
         upDb(
-            "anotacoes/" + id,
+            pathAnotacoesUser + "/" + id,
             {
                 todo: input,
                 updateAt: new Date().toString(),
@@ -76,7 +64,7 @@ export function useDatabaseAnotacao() {
     function deleteAnotacao(id) {
         // setAnotacoes((old) => old.filter((item) => item.key !== keytabs))
 
-        reDb("anotacoes/" + id);
+        reDb(pathAnotacoesUser + "/" + id);
     }
 
     function getAnotacao(keytabs) {
