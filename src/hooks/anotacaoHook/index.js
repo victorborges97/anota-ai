@@ -1,4 +1,4 @@
-import { auth, useFirebase } from "../../context/firebase";
+import { useFirebase } from "../../context/firebase";
 import { v4 as uuidv4 } from 'uuid';
 import { useRecoilState } from "recoil";
 import { todosListState } from "../../Atons/Todo";
