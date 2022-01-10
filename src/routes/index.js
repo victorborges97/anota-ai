@@ -10,7 +10,7 @@ import { RecoilRoot } from "recoil";
 
 import FirebaseProvider, { useFirebase } from "../context/firebase";
 
-import Home from "../pages/Home";
+// import Home from "../pages/Home";
 import Anotacoes from "../pages/Anotacoes";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -22,8 +22,8 @@ function Routes() {
             <FirebaseProvider>
                 <Router>
                     <Switch>
-                        <Route path="/" exact component={Home} />
-                        <PrivateRoute path="/anotacoes" exact component={Anotacoes} />
+                        {/* <Route path="/" exact component={Home} /> */}
+                        <PrivateRoute path="/" exact component={Anotacoes} />
                         <ConfirmRoute path="/login" exact component={Login} />
                         <Route path="/register" exact component={Register} />
                         <Route path="*" component={NotFound} />
@@ -68,7 +68,7 @@ const ConfirmRoute = ({ component: Component, ...rest }) => {
             render={props =>
                 isAuthenticated() ? (
                     // eslint-disable-next-line react/prop-types
-                    <Redirect to={{ pathname: "/anotacoes", state: { from: props.location } }} />
+                    <Redirect to={{ pathname: "/", state: { from: props.location } }} />
                 ) : (
                     <Component {...props} />
                 )
