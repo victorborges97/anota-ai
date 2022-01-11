@@ -44,3 +44,12 @@ export const LoginLocalStorage = token => {
 export function remover_acentos_lowercase(str) {
   return str.normalize('NFD').replace(/([\u0300-\u036f]|[^0-9a-zA-Z\s])/g, '').toLowerCase();
 }
+
+export function delay(delay) {
+  return new Promise(res => setTimeout(res, delay));
+}
+
+export function toTimestamp(strDate) {
+  var datum = Date.parse(strDate);
+  return datum / 1000;
+}

@@ -5,6 +5,7 @@ import { IoMdCheckboxOutline } from "react-icons/io";
 import Button from "../../components/button";
 import { useDatabaseAnotacao } from "../../hooks/anotacaoHook";
 import { useFirebase } from "../../context/firebase";
+import IconButton from "../../components/iconButton";
 
 export const Todo = ({ tabSelecionada, handleError }) => {
 
@@ -317,17 +318,19 @@ export const Modal = ({ open, close, save, itemModal, value, onChange, onKeyDown
 }
 
 export const ItemColecao = ({
+    ref,
     item,
     tabSelecionada,
     openModal,
     mudarTab,
     deleteTab,
     handleError,
+    ...rest
 }) => {
 
     return (
         <li
-            key={item.key}
+            ref={ref}
             className={`
                 flex flex-col md:flex-row 
                 justify-between
@@ -351,21 +354,20 @@ export const ItemColecao = ({
                 }
             `}
             onClick={() => mudarTab(item)}
+            {...rest}
         >
 
-            <p
-                className={`
-                    text-left truncate
-                `}
-            >
-                {item.name}
-            </p>
+            <div className="flex items-center justify-center">
+                <p className="text-left truncate">
+                    {item.name}
+                </p>
+            </div>
 
             <div
                 className="flex justify-between mt-2 md:mt-0"
             >
-                <FiEdit
-                    className="text-emerald-500"
+
+                <IconButton
                     onClick={() => {
                         if (item != null) {
                             openModal(item)
@@ -373,14 +375,19 @@ export const ItemColecao = ({
                             handleError(false, "Seleciona uma Tab, para editar!")
                         }
                     }}
-                ></FiEdit>
+                    className="flex items-center justify-center"
+                >
+                    <FiEdit
+                        className="text-emerald-500"
+                    ></FiEdit>
+
+                </IconButton>
 
                 <div
                     className="w-3"
                 ></div>
 
-                <FiDelete
-                    className="text-red-500"
+                <IconButton
                     onClick={() => {
                         if (item != null) {
                             deleteTab(item)
@@ -388,7 +395,15 @@ export const ItemColecao = ({
                             handleError(false, "Seleciona uma Tab, para editar!")
                         }
                     }}
-                ></FiDelete>
+                    className="flex items-center justify-center"
+                >
+                    <FiDelete
+                        className="text-red-500"
+
+                    ></FiDelete>
+                </IconButton>
+
+
             </div>
 
         </li>

@@ -13,6 +13,7 @@ export function useDatabaseAnotacao(idUser) {
     async function init() {
 
         onDb(pathAnotacoesUser, (snapshot) => {
+            // console.log("Initi onDb useDatabaseAnotacao")
             if (snapshot.exists()) {
                 let anotacoesData = snapshot.val();
                 var data = [];
@@ -49,13 +50,23 @@ export function useDatabaseAnotacao(idUser) {
         )
     }
 
-    function updateAnotacao(input, id) {
-        upDb(
-            pathAnotacoesUser + "/" + id,
-            {
+    async function updateAnotacao(input, id, orderBy = null) {
+        let data = {};
+        if (orderBy !== null) {
+            data = {
+                updateAt: new Date().toString(),
+                ordeBy: orderBy,
+            }
+        } else {
+            data = {
                 todo: input,
                 updateAt: new Date().toString(),
             }
+        }
+        console.log(pathAnotacoesUser + "/" + id + " - update: ", data)
+        await upDb(
+            pathAnotacoesUser + "/" + id,
+            data,
         )
     }
 

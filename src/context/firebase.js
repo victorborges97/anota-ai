@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { initializeApp } from "firebase/app";
+import { getApps, initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
-import { getDatabase, ref, set, onValue, child, get, update, remove } from "firebase/database";
+import { getDatabase, ref, set, onValue, child, get, update, remove, query, orderByChild } from "firebase/database";
 
 import { LoginLocalStorage } from '../Utils';
 
@@ -23,7 +23,13 @@ const firebaseConfig = {
 // from a component later
 const FirebaseContext = createContext();
 
-const app = initializeApp(firebaseConfig);
+let app;
+
+if (!getApps().length) {
+    app = initializeApp(firebaseConfig)
+} else {
+    app = getApps();
+}
 const database = getDatabase(app);
 const dbRef = ref(database);
 export const auth = getAuth();
@@ -33,13 +39,29 @@ export default function FirebaseProvider({ children }) {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
                 LoginLocalStorage(user);
 
-                onUserData(user.uid);
+                await getUserData(user.uid).then(userData => {
+
+                    let info = userData.val();
+                    const userInfor = {
+                        "uid": `${user.uid}`,
+                        "photoURL": `${info.photoURL}`,
+                        "phoneNumber": `${info.phoneNumber}`,
+                        "email": `${info.email}`,
+                        "displayName": `${info.displayName}`,
+                        "refreshToken": `${user.refreshToken}`,
+                    }
+
+                    LoginLocalStorage(userInfor);
+                    setUser(userInfor);
+
+                });
+
                 // ...
             } else {
                 // User is signed out
@@ -47,19 +69,20 @@ export default function FirebaseProvider({ children }) {
                 LogoutLocalStorage();
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function writeUserData(userId, userInfor) {
         set(ref(database, 'users/' + userId), userInfor);
     }
-    function onUserData(userId) {
-        let user = {};
-        const userRef = ref(database, 'users/' + userId);
-        onValue(userRef, (snapshot) => {
-            user = snapshot.val();
-            setUser(user)
-        });
-    }
+    // function onUserData(userId) {
+    //     let user = {};
+    //     const userRef = ref(database, 'users/' + userId);
+    //     onValue(userRef, (snapshot) => {
+    //         user = snapshot.val();
+    //         setUser(user)
+    //     });
+    // }
     function getUserData(userId) {
         return getDb("users/" + userId);;
     }
@@ -81,6 +104,9 @@ export default function FirebaseProvider({ children }) {
     //LOGIN E LOGOUT
     async function getDb(path) {
         return get(child(dbRef, `${path}`));
+    }
+    async function getDbOrdeBy(path, orderBy) {
+        return get(query(child(dbRef, `${path}`), ...[orderByChild(orderBy)]));
     }
     async function reDb(path) {
         remove(child(dbRef, `${path}`))
@@ -144,10 +170,10 @@ export default function FirebaseProvider({ children }) {
     }
     async function loginEmail(email, senha) {
         if (email === null || email === "") {
-            throw new Error({ message: 'E-mail está faltando' });
+            throw new Error({ message: 'E-mail em branco!' });
         }
         if (senha === null || senha === "") {
-            throw new Error({ message: 'Senha está faltando' });
+            throw new Error({ message: 'Senha em branco!' });
         }
 
         try {
@@ -155,19 +181,22 @@ export default function FirebaseProvider({ children }) {
 
             if (user) {
 
-                let userData = await getUserData(user.uid);
+                await getUserData(user.uid).then(userData => {
 
-                const userInfor = {
-                    "uid": user.uid,
-                    "photoURL": userData.photoURL,
-                    "phoneNumber": userData.phoneNumber,
-                    "email": userData.email,
-                    "displayName": userData.displayName,
-                    "refreshToken": user.refreshToken,
-                }
+                    let info = userData.val();
+                    const userInfor = {
+                        "uid": `${user.uid}`,
+                        "photoURL": `${info.photoURL}`,
+                        "phoneNumber": `${info.phoneNumber}`,
+                        "email": `${info.email}`,
+                        "displayName": `${info.displayName}`,
+                        "refreshToken": `${user.refreshToken}`,
+                    }
 
-                LoginLocalStorage(userInfor);
-                setUser(userInfor)
+                    LoginLocalStorage(userInfor);
+                    setUser(userInfor);
+
+                });
 
             }
         } catch (error) {
@@ -199,6 +228,7 @@ export default function FirebaseProvider({ children }) {
             onDb,
             upDb,
             reDb,
+            getDbOrdeBy,
         }}>
             {children}
         </FirebaseContext.Provider>
@@ -220,6 +250,7 @@ export function useFirebase() {
         onDb,
         upDb,
         reDb,
+        getDbOrdeBy,
     } = context;
     return {
         auth,
@@ -232,5 +263,6 @@ export function useFirebase() {
         onDb,
         upDb,
         reDb,
+        getDbOrdeBy,
     };
 }

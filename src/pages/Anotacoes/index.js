@@ -10,18 +10,19 @@ import { useDatabaseAnotacao } from '../../hooks/anotacaoHook';
 
 import Toggle from '../../components/themeToggle';
 import Background from '../../components/background';
-import { ItemColecao, Modal, Todo } from './components';
+import { Modal, Todo } from './components';
 import Confirm from '../../components/confirm';
 import { useFirebase, USER } from '../../context/firebase';
 import IconButton from '../../components/iconButton';
+import ListColecao from '../../components/ListColecao';
 
 const TodoScreen = () => {
     const userJson = JSON.parse(localStorage.getItem(USER));
 
-    const { replace } = useHistory()
-    const { user, authenticated } = useFirebase();
-    const { colecoes, init: initColecao, addColecao, deleteColecao, updateColecao } = useDatabaseColecao(userJson?.uid)
-    const { init: initAnotacao, deleteAnotacaoColecoesId } = useDatabaseAnotacao(userJson?.uid)
+    const { replace } = useHistory();
+    const { authenticated } = useFirebase();
+    const { colecoes, setColecoes, init: initColecao, addColecao, deleteColecao, updateColecao } = useDatabaseColecao(userJson?.uid);
+    const { init: initAnotacao, deleteAnotacaoColecoesId } = useDatabaseAnotacao(userJson?.uid);
 
     // Colecao Selecionada
     const [tabSelecionada, setTabSelecionada] = useState(colecoes.lenght <= 0 ? null : colecoes[0]);
@@ -131,12 +132,17 @@ const TodoScreen = () => {
         setConfirmOpen(false);
     }
 
+
+    let name = userJson ? ", " + userJson?.displayName : "";
+
     return (
         <Background>
             <div className="flex flex-col ml-8 mr-8">
                 <div className="flex flex-col md:flex-row justify-center md:justify-between items-center md:items-between w-full min-w-0 mt-8 p-6 mb-5 text-gray-900 dark:text-white bg-slate-200 dark:bg-[#282c34] rounded-xl">
 
-                    <p>Seja bem-vindo <span className="font-bold">{userJson ? `, ${userJson?.displayName}` : ""}</span></p>
+                    <p>
+                        Seja bem-vindo<span className="font-bold">{name}</span>
+                    </p>
 
                     <IconButton
                         onClick={() => {
@@ -145,25 +151,15 @@ const TodoScreen = () => {
                         }}
                         className="flex items-center justify-center"
                     >
-                        Sair <p className="w-2"></p>
-                        <FiLogOut />
+                        Sair<p className="w-2"></p><FiLogOut />
                     </IconButton>
 
                 </div>
             </div>
 
-            <main className={`
-            bg-white dark:bg-[#19191f] transition-all
-            flex flex-col md:flex-row 
-            min-h-0 min-w-0 overflow-hidden
-            p-0 ml-8 mr-8
-            `}>
+            <main className="bg-white dark:bg-[#19191f] transition-all flex flex-col md:flex-row min-h-0 min-w-0 overflow-hidden p-0 ml-8 mr-8">
 
-                <aside className={`
-                h-full md:w-1/5 
-                bg-slate-200 dark:bg-[#282c34]
-                rounded-xl
-                `}>
+                <aside className="h-full md:w-1/5 bg-slate-200 dark:bg-[#282c34] rounded-xl">
 
                     <ul className="pb-4 mt-4">
                         <li className="flex flex-row justify-between items-center h-14">
@@ -176,22 +172,7 @@ const TodoScreen = () => {
                             />
 
                             <div
-                                className={`
-                                md:hidden
-                                flex-1 sm:w-full block p-3
-                                
-                                hover:border-dashed 
-                                hover:border-slate-500
-                                dark:hover:border-[#21252b]
-                                hover:border-2
-                                hover:rounded-xl
-
-                                cursor-pointer
-
-                                text-center
-                                text-gray-900 dark:text-white
-                                font-bold
-                                `}
+                                className="md:hidden flex-1 sm:w-full block p-3 hover:border-dashed hover:border-slate-500 dark:hover:border-[#21252b] hover:border-2 hover:rounded-xl cursor-pointer text-center text-gray-900 dark:text-white font-bold"
                                 onClick={() => openModal(null)}
                             >
 
@@ -206,87 +187,27 @@ const TodoScreen = () => {
                         </li>
                     </ul>
 
-                    <ul className={`
-                        p-2 text-center 
-                        flex flex-row md:flex-col w-full 
-                        md:overflow-hidden overflow-auto
-                        md:items-center
-                        transition-all
-                        mb-4
-                    `}>
+                    <ListColecao
+                        colecoes={colecoes}
+                        setColecoes={setColecoes}
+                        novaColecao={() => openModal(null)}
 
-                        <li
-                            className={`
-                                flex-1 md:w-full p-3
+                        tabSelecionada={tabSelecionada}
+                        openModal={openModal}
+                        mudarTab={mudarTab}
+                        openConfirm={openConfirm}
+                        handleError={handleError}
 
-                                hidden md:block
-                                
-                                hover:border-dashed 
-                                hover:border-slate-500
-                                dark:hover:border-[#21252b]
-                                hover:border-2
-                                hover:rounded-xl
-
-                                cursor-pointer
-
-                                text-center
-                                text-gray-900 dark:text-white
-                                font-bold
-                            `}
-                            onClick={() => openModal(null)}
-                        >
-
-                            NOVA COLEÇÃO
-
-                        </li>
-
-
-                        {
-                            colecoes && colecoes.map((item, index) => (
-                                <ItemColecao
-                                    item={item}
-                                    tabSelecionada={tabSelecionada}
-                                    openModal={openModal}
-                                    mudarTab={mudarTab}
-                                    deleteTab={openConfirm}
-                                    handleError={handleError}
-                                />
-                            ))
-                        }
-
-                        {
-                            colecoes && colecoes.length <= 0 && (
-                                <div
-                                    className={`
-                                        flex-1 md:w-full p-3
-
-                                        hidden md:block
-                                        
-                                        hover:border-slate-500
-                                        dark:hover:border-[#21252b]
-
-                                        text-center
-                                        text-gray-900 dark:text-white
-                                    `}
-                                >
-
-                                    Sua lista de coleções está vazia {"\n"} adicione uma nova
-
-                                </div>
-                            )
-                        }
-                    </ul>
+                        updateColecao={updateColecao}
+                        activeDrag={false}
+                    />
 
                 </aside>
 
 
                 {
                     tabSelecionada != null && (
-                        <div className={`
-                        md:h-full flex-1 flex flex-col min-h-0 min-w-0
-                        
-                        md:ml-4 mt-4 md:mt-0
-                        `}>
+                        <div className="md:h-full flex-1 flex flex-col min-h-0 min-w-0 md:ml-4 mt-4 md:mt-0">
 
                             <div className="flex flex-col lg:flex-row h-full w-full bg-slate-200 dark:bg-[#282c34] rounded-xl ">
                                 <div className="w-full min-w-0 mb-4">

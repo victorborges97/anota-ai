@@ -10,6 +10,7 @@
     "firebase": "^9.6.2",
     "moment": "^2.29.1",
     "react": "^17.0.1",
+    "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.1",
     "react-icons": "^4.1.0",
     "react-router-dom": "^5.2.0",
