@@ -71,7 +71,7 @@ const Login = () => {
                         </p>
                     </div>
 
-                    <div className="w-full md:w-1/2 flex flex-col items-center bg-white py-5 md:py-8 px-4">
+                    <div className="w-full md:w-1/2 flex flex-col items-center bg-white text-gray-900 py-5 md:py-8 px-4">
                         <h3 className="mb-4 font-bold text-3xl flex items-center text-gray-900">
                             LOGIN
                         </h3>
