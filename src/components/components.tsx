@@ -3,7 +3,17 @@ import { FiEdit, FiDelete } from "react-icons/fi";
 import { TabList } from "../Atons/Todo";
 import IconButton from "./iconButton";
 
-export const Alert = ({ color, message, showAlert, setShowAlert }) => {
+export const Alert = ({
+  color,
+  message,
+  showAlert,
+  setShowAlert,
+}: {
+  color: string;
+  message: string;
+  showAlert: boolean;
+  setShowAlert: (boolean: boolean) => void;
+}) => {
   return (
     <>
       {showAlert ? (
